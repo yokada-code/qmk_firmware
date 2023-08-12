@@ -17,8 +17,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include QMK_KEYBOARD_H
-#include "print.h"
+#ifdef CONSOLE_ENABLE
+    #include "print.h"
+#endif
 
+#ifdef OLED_ENABLE
+    #include "oled.h"
+#endif
 
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
 // The underscores don't mean anything - you can have a layer called STUFF or any other name.
@@ -51,31 +56,22 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 
 void keyboard_post_init_user(void) {
 #ifdef CONSOLE_ENABLE
-  // Customise these values to desired behaviour
-  debug_enable=true;
-  debug_matrix=true;
-  //debug_keyboard=true;
-  //debug_mouse=true;
+    // Customise these values to desired behaviour
+    debug_enable=true;
+    debug_matrix=true;
+    //debug_keyboard=true;
+    //debug_mouse=true;
 #endif 
 }
+
 
 #ifdef OLED_ENABLE
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     if (is_keyboard_master()) {
         return OLED_ROTATION_270;
     } else {
-        return rotation;
-        //return OLED_ROTATION_90;
+        return OLED_ROTATION_0;
     }
-}
-
-void render_crkbd_logo(void) {
-    static const char PROGMEM crkbd_logo[] = {
-        0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, 0x92, 0x93, 0x94,
-        0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf, 0xb0, 0xb1, 0xb2, 0xb3, 0xb4,
-        0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1, 0xd2, 0xd3, 0xd4,
-        0};
-    oled_write_P(crkbd_logo, false);
 }
 
 #    define KEYLOG_LEN 5
@@ -181,7 +177,7 @@ bool oled_task_user(void) {
     if (is_keyboard_master()) {
         render_status_main();  // Renders the current keyboard state (layer, lock, caps, scroll, etc)
     } else {
-        render_crkbd_logo();
+        render_bongocat();
     }
     return false;
 }
