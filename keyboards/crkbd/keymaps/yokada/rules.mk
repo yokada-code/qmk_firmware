@@ -11,7 +11,7 @@ WPM_ENABLE = yes
 
 EXTRAFLAGS += -flto
 
-SRC += oled_bongo.c
+SRC += oled_bongo.c oled_luna.c
 
 #CONSOLE_ENABLE = yes
 RGBLIGHT_ENABLE = no
