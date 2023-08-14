@@ -49,6 +49,9 @@ void led_set(uint8_t usb_led);
 
 void led_init_ports(void);
 
+uint32_t last_led_activity_time(void);    // Timestamp of the LED activity
+uint32_t last_led_activity_elapsed(void); // Number of milliseconds since the last LED activity
+
 #ifdef __cplusplus
 }
 #endif

@@ -378,6 +378,14 @@ void switch_events(uint8_t row, uint8_t col, bool pressed) {
 #endif
 }
 
+static uint32_t last_led_modification_time = 0;
+uint32_t        last_led_activity_time(void) {
+    return last_led_modification_time;
+}
+uint32_t last_led_activity_elapsed(void) {
+    return timer_elapsed32(last_led_modification_time);
+}
+
 /** \brief Keyboard task: Do keyboard routine jobs
  *
  * Do routine keyboard jobs:
@@ -551,6 +559,7 @@ MATRIX_LOOP_END:
     // update LED
     if (led_status != host_keyboard_leds()) {
         led_status = host_keyboard_leds();
+        last_led_modification_time = timer_read32();
         keyboard_set_leds(led_status);
     }
 }
