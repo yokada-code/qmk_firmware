@@ -58,6 +58,10 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return new;
 }
 
+bool is_keyboard_master(void) {
+    return IS_LEFT_HAND;
+}
+
 ///////////////////////////
 // keyboard initialization
 ///////////////////////////

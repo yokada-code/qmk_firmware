@@ -1,0 +1,1 @@
+../yokada_crkbd_left/config.h
