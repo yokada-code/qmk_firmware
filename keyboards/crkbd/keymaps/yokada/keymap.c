@@ -79,6 +79,10 @@ void oled_task_user(void) {
 #endif
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    bool continue_process = process_record_user_bmp(keycode, record);
+    if (continue_process == false) {
+        return false;
+    }
     process_record_user_luna(keycode, record);
     return true;
 }

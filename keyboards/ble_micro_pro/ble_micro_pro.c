@@ -18,7 +18,13 @@
 
 void keyboard_post_init_user()
 {
-    debug_enable = false;
+#ifdef CONSOLE_ENABLE
+    // Customise these values to desired behaviour
+    debug_enable=true;
+    debug_matrix=true;
+    //debug_keyboard=true;
+    //debug_mouse=true;
+#endif
 }
 
 void create_user_file()
