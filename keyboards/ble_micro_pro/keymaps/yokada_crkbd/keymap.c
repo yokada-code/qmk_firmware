@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "bmp.h"
 #include "bmp_custom_keycode.h"
 #include "keycode_str_converter.h"
+#include "apidef.h"
 
 // Defines the keycodes used by our macros in process_record_user
 enum custom_keycodes {
@@ -59,7 +60,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 }
 
 bool is_keyboard_master(void) {
-    return IS_LEFT_HAND;
+    return BMPAPI->app.get_config()->mode == SPLIT_MASTER;
 }
 
 ///////////////////////////
