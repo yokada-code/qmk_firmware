@@ -49,11 +49,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define RGBLIGHT_VAL_STEP 17
 
 #define OLED_FONT_H "keyboards/crkbd/lib/glcdfont.c"
-
 #define OLED_TIMEOUT 60000
 #define OLED_BRIGHTNESS 120
-#define SPLIT_WPM_ENABLE
-
+#define BLE_WPM_SEND_FROM_MASTER
 
 #define LAYOUT_split_3x6_3( \
   L00, L01, L02, L03, L04, L05,           R00, R01, R02, R03, R04, R05, \

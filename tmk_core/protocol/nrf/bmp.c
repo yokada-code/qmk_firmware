@@ -93,6 +93,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef VELOCIKEY_ENABLE
   #include "velocikey.h"
 #endif
+#ifdef BLE_WPM_SEND_FROM_MASTER
+    #include "wpm.h"
+#endif
 
 #include "keycode_str_converter.h"
 #include "config_file_util.h"
@@ -294,9 +297,17 @@ MATRIX_LOOP_END:
 
 bmp_error_t nus_rcv_callback(const uint8_t* dat, uint32_t len)
 {
+#ifdef BLE_WPM_SEND_FROM_MASTER
+    uint8_t current_wpm;
+#endif
     if (len == sizeof(rgblight_syncinfo_t))
     {
         rgblight_update_sync((rgblight_syncinfo_t*)dat, false);
+#ifdef BLE_WPM_SEND_FROM_MASTER
+    } else if (len == sizeof(current_wpm)){
+        current_wpm = *dat;
+        set_current_wpm(current_wpm);
+#endif
     }
     return BMP_OK;
 }

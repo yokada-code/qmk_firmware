@@ -93,6 +93,15 @@ void update_wpm(uint16_t keycode) {
 }
 
 void decay_wpm(void) {
+#ifdef BLE_WPM_SEND_FROM_MASTER
+    if (!is_keyboard_master()) {
+        // Disable decays in the slave device to prevent
+        // conflicts between the value calicurated in the
+        // slave device and the value sent from the master device.
+        // It cause unstable wpm display on the slave side.
+        return;
+    }
+#endif
     if (timer_elapsed(wpm_timer) > 1000) {
         current_wpm += (-current_wpm) * wpm_smoothing;
         wpm_timer = timer_read();

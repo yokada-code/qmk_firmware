@@ -43,8 +43,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MATRIX_COLS_DEFAULT 19
 #define THIS_DEVICE_ROWS 1
 #define THIS_DEVICE_COLS 19
-//#define IS_LEFT_HAND  true
-//#define BMP_DEFAULT_MODE SINGLE
+#define IS_LEFT_HAND  true
+#define BMP_DEFAULT_MODE SINGLE
 
 /*
  * Enable mass storage when the switch connected following pins is pushed on boot.
