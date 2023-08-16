@@ -189,6 +189,10 @@ void print_status_luna(void) {
         oled_write("-", false);
     }
 
+    oled_set_cursor(0, 7);
+    oled_write_P(PSTR("W:"), false);
+    oled_write(get_u8_str(get_current_wpm(), '0'), false);
+
     // Render LUNA
     render_luna(0, 13);
 }
