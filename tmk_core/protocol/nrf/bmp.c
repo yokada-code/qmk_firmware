@@ -315,10 +315,13 @@ bmp_error_t nus_rcv_callback(const uint8_t* dat, uint32_t len)
 static bool is_usb_connected_ = false;
 static bool is_usb_powered_   = false;
 static bool is_ble_connected_ = false;
+static uint8_t advertise_to_  = 0;
 
 bool is_usb_connected() { return is_usb_connected_; }
 bool is_usb_powered() { return is_usb_powered_; }
 bool is_ble_connected() { return is_ble_connected_; }
+uint8_t get_advertise_to() { return advertise_to_; }
+void set_advertise_to(uint8_t id) { advertise_to_ = id; }
 
 __attribute__((weak)) void bmp_state_change_cb_user(bmp_api_event_t event) {}
 __attribute__((weak)) void bmp_state_change_cb_kb(bmp_api_event_t event) {
@@ -603,6 +606,7 @@ void bmp_init()
   else if ((config->mode == SINGLE || config->mode == SPLIT_MASTER) &&
     config->startup == 1)
   {
+    set_advertise_to(255);
     BMPAPI->ble.advertise(255);
   }
 
@@ -759,9 +763,11 @@ bool process_record_user_bmp(uint16_t keycode, keyrecord_t* record) {
                 select_usb();
                 return false;
             case ADV_ID0 ... ADV_ID7:
+                set_advertise_to(keycode - ADV_ID0);
                 BMPAPI->ble.advertise(keycode - ADV_ID0);
                 return false;
             case AD_WO_L:
+                set_advertise_to(255);
                 BMPAPI->ble.advertise(255);
                 return false;
             case DEL_ID0 ... DEL_ID7:

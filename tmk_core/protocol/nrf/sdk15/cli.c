@@ -142,8 +142,10 @@ static MSCMD_USER_RESULT usrcmd_advertise(MSOPT *msopt, MSCMD_USER_OBJECT usrobj
         if (msopt->argc >= 2) {
             msopt_get_argv(msopt, 1, arg, sizeof(arg));
             uint8_t id = (uint8_t)atoi(arg);
+            set_advertise_to(id);
             BMPAPI->ble.advertise(id);
         } else {
+            set_advertise_to(255);
             BMPAPI->ble.advertise(255);
         }
     }

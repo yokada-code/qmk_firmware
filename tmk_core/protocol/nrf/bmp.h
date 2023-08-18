@@ -34,6 +34,8 @@ void select_ble(void);
 void select_usb(void);
 bool is_ble_connected();
 bool is_usb_connected();
+uint8_t get_advertise_to();
+void set_advertise_to(uint8_t id);
 
 extern int sleep_enter_counter;
 extern int reset_counter;
