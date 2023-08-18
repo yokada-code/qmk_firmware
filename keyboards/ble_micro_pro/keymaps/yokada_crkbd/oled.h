@@ -1,8 +1,6 @@
 #pragma once
 #include QMK_KEYBOARD_H
 
-#define OLED_HOSTNAME_MAX 5
-
 enum crkbd_layers {
     _QWERTY,
     _LOWER,
@@ -16,3 +14,7 @@ void print_status_bongo(void);
 
 char get_bt_advertisement_status_char(void);
 void get_bt_connection_status_str(char *status_str, char *host_name);
+
+#define CON_STATUS_STR_LEN 5
+uint8_t ble_con_status[CON_STATUS_STR_LEN];
+uint8_t ble_con_hostname[CON_STATUS_STR_LEN];

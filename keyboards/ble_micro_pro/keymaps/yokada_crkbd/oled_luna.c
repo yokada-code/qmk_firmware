@@ -133,8 +133,6 @@ static void render_luna(int LUNA_X, int LUNA_Y) {
 }
 
 void print_status_luna(void) {
-    char bt_con_status[5];
-    char bt_host_name[OLED_HOSTNAME_MAX];
     // Print current mode
     oled_set_cursor(0, 0);
     if (keymap_config.swap_lctl_lgui) {
@@ -200,10 +198,9 @@ void print_status_luna(void) {
     oled_set_cursor(0, 8);
     oled_write_P(PSTR("BTCON"), false);
     oled_set_cursor(1, 9);
-    get_bt_connection_status_str(bt_con_status, bt_host_name);
-    oled_write(bt_con_status, false);
+    oled_write((char*)ble_con_status, false);
     oled_set_cursor(1, 10);
-    oled_write(bt_host_name, false);
+    oled_write((char*)ble_con_hostname, false);
 
     // Print Bluetooth advertisement status
     oled_set_cursor(0, 11);

@@ -91,9 +91,6 @@ static void render_anim(void) {
 }
 
 void print_status_bongo(void){
-    char bt_con_status[6];
-    char bt_host_name[OLED_HOSTNAME_MAX];
-
     render_anim();
 
     oled_set_cursor(14, 0);  // (OLED_DISPLAY_WIDTH / OLED_FONT_WIDTH) - len(wps_msg)
@@ -102,8 +99,7 @@ void print_status_bongo(void){
 
      // Print Bluetooth connection status
     oled_set_cursor(17, 1);
-    get_bt_connection_status_str(bt_con_status, bt_host_name);
-    oled_write(bt_con_status, false);
+    oled_write((char*) ble_con_status, false);
 
     // Print Bluetooth advertisement status
     oled_set_cursor(18, 2);
