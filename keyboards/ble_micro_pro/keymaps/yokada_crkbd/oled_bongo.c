@@ -90,11 +90,24 @@ static void render_anim(void) {
     }
 }
 
-void render_bongocat(void){
+void print_status_bongo(void){
+    char bt_con_status[6];
+    char bt_host_name[OLED_HOSTNAME_MAX];
+
     render_anim();
 
     oled_set_cursor(14, 0);  // (OLED_DISPLAY_WIDTH / OLED_FONT_WIDTH) - len(wps_msg)
     oled_write_P(PSTR("WPM:"), false);
     oled_write(get_u8_str(get_current_wpm(), '0'), false);
+
+     // Print Bluetooth connection status
+    oled_set_cursor(17, 1);
+    get_bt_connection_status_str(bt_con_status, bt_host_name);
+    oled_write(bt_con_status, false);
+
+    // Print Bluetooth advertisement status
+    oled_set_cursor(18, 2);
+    oled_write_P(PSTR("A:"), false);
+    oled_write_char(get_bt_advertisement_status_char(), false);
 }
 

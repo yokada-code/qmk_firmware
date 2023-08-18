@@ -11,7 +11,7 @@ MOUSEKEY_ENABLE = yes
 
 EXTRAFLAGS += -flto
 
-SRC += oled_bongo.c oled_luna.c
+SRC += oled_bongo.c oled_luna.c oled_common.c
 
 CONSOLE_ENABLE = yes
 #RGBLIGHT_ENABLE = no

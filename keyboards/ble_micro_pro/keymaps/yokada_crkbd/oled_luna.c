@@ -133,6 +133,8 @@ static void render_luna(int LUNA_X, int LUNA_Y) {
 }
 
 void print_status_luna(void) {
+    char bt_con_status[5];
+    char bt_host_name[OLED_HOSTNAME_MAX];
     // Print current mode
     oled_set_cursor(0, 0);
     if (keymap_config.swap_lctl_lgui) {
@@ -164,7 +166,7 @@ void print_status_luna(void) {
     }
 
     // Print animation status
-    oled_set_cursor(0, 6);
+    oled_set_cursor(1, 5);
     if(isJumping){
         oled_write("J", false);
     } else {
@@ -189,9 +191,24 @@ void print_status_luna(void) {
         oled_write("-", false);
     }
 
-    oled_set_cursor(0, 7);
+    // Print WPS
+    oled_set_cursor(0, 6);
     oled_write_P(PSTR("W:"), false);
     oled_write(get_u8_str(get_current_wpm(), '0'), false);
+
+    // Print Bluetooth connection status
+    oled_set_cursor(0, 8);
+    oled_write_P(PSTR("BTCON"), false);
+    oled_set_cursor(1, 9);
+    get_bt_connection_status_str(bt_con_status, bt_host_name);
+    oled_write(bt_con_status, false);
+    oled_set_cursor(1, 10);
+    oled_write(bt_host_name, false);
+
+    // Print Bluetooth advertisement status
+    oled_set_cursor(0, 11);
+    oled_write_P(PSTR("ADV:"), false);
+    oled_write_char(get_bt_advertisement_status_char(), false);
 
     // Render LUNA
     render_luna(0, 13);
