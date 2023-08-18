@@ -47,10 +47,10 @@ void get_bt_connection_status_str(char *status_str, char *hostname){
 
             if ((stat >> 8) == 0) {
                 status_str[0] = '-';
-                hostname[0] = ' ';
-                hostname[1] = 'N';
-                hostname[2] = '/';
-                hostname[3] = 'A';
+                hostname[0] = '-';
+                hostname[1] = '-';
+                hostname[2] = '-';
+                hostname[3] = '-';
                 hostname[4] = '\0';
             } else {
                 status_str[0] = '0' + (stat & 0xff);
@@ -73,6 +73,13 @@ void get_bt_connection_status_str(char *status_str, char *hostname){
             hostname[1] = 'U';
             hostname[2] = 'S';
             hostname[3] = 'B';
+            hostname[4] = '\0';
+        } else {
+            status_str[0] = '-';
+            hostname[0] = '-';
+            hostname[1] = '-';
+            hostname[2] = '-';
+            hostname[3] = '-';
             hostname[4] = '\0';
         }
     } else {
