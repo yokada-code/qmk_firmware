@@ -157,7 +157,7 @@ void print_status_luna(void) {
             oled_write("LOWER", false);
             break;
         case _ADJUST:
-            oled_write("ADJ", false);
+            oled_write("ADJ  ", false);
             break;
         default:
             oled_write("UNDEF", false);
