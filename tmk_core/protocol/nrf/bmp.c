@@ -614,6 +614,9 @@ bool get_ble_enabled() { return ble_enabled & has_ble; }
 void set_ble_enabled(bool enabled) { ble_enabled = enabled; }
 bool get_usb_enabled() { return usb_enabled & has_usb; }
 void set_usb_enabled(bool enabled) { usb_enabled = enabled; }
+
+__attribute__((weak)) void bmp_select_changed_user_cb() {}
+
 void select_ble(void) {
     if (usb_enabled) {
         report_keyboard_t report_keyboard = {0};
@@ -623,6 +626,7 @@ void select_ble(void) {
     }
     ble_enabled = true;
     usb_enabled = false;
+    bmp_select_changed_user_cb();
 }
 void select_usb(void) {
     if (ble_enabled) {
@@ -633,6 +637,7 @@ void select_usb(void) {
     }
     ble_enabled = false;
     usb_enabled = true;
+    bmp_select_changed_user_cb();
 }
 
 extern bool stop_reentrant_process_exkc;
