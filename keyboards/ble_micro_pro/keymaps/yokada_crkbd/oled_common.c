@@ -5,10 +5,20 @@
 uint8_t display_flags = 0;
 static bool is_ble_advertising = false;
 
+static char get_hex_char(uint8_t i){
+    if (i<10) {
+        return '0' + (char) i;
+    } else if (i<16) {
+        return 'a' + (char) i-10;
+    } else {
+        return '!';
+    }
+}
+
 void set_bt_connection_status_str(void){
     bmp_api_bonding_info_t peers[8];
     uint32_t peer_cnt = sizeof(peers)/sizeof(peers[0]);
-    uint16_t bonding_map = 0;
+    uint8_t bonding_map = 0;
 
     BMPAPI->ble.get_bonding_info(peers, &peer_cnt);
     for (int i = 0; i < peer_cnt; i++) {
@@ -29,7 +39,7 @@ void set_bt_connection_status_str(void){
                 ble_con_hostname[3] = '-';
                 ble_con_hostname[4] = '\0';
             } else {
-                ble_con_status[0] = '0' + (stat & 0xff);
+                ble_con_status[0] = get_hex_char(stat & 0xff);
 
                 for (i = 0; i < peer_cnt; i++) {
                      if (peers[i].id == (stat & 0xff)) {
@@ -63,8 +73,8 @@ void set_bt_connection_status_str(void){
         ble_con_hostname[0] = '\0';
     }
     ble_con_status[1] = ':';
-    ble_con_status[2] = '0' + (char) (bonding_map >> 8);
-    ble_con_status[3] = '0' + (char) (bonding_map & 0xff);
+    ble_con_status[2] = get_hex_char(bonding_map >> 4);
+    ble_con_status[3] = get_hex_char(bonding_map & 0xf);
     ble_con_status[4] = '\0';
 }
 
