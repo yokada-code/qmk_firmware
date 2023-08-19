@@ -73,7 +73,7 @@ static void render_anim(void) {
     }
     if (get_current_wpm() != 000 || display_flags & BMP_USER_FLAG_OLED_ON) {
         oled_on();  // not essential but turns on animation OLED with any alpha keypress
-        display_flags ^= BMP_USER_FLAG_OLED_ON;
+        display_flags &= ~BMP_USER_FLAG_OLED_ON;
         if (timer_elapsed32(anim_timer) > ANIM_FRAME_DURATION) {
             anim_timer = timer_read32();
             animation_phase();

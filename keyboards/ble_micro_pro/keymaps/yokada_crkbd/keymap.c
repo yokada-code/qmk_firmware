@@ -85,7 +85,7 @@ void oled_task_user(void) {
                 .data = current_wpm,
             };
             BMPAPI->ble.nus_send_bytes((uint8_t*)&dat, sizeof(dat));
-            current_wpm = last_wpm;
+            last_wpm = current_wpm;
         }
         print_status_luna();
     } else {

@@ -119,7 +119,7 @@ static void render_luna(int LUNA_X, int LUNA_Y) {
     if (get_current_wpm() != 000 || display_flags & BMP_USER_FLAG_OLED_ON) {
         oled_on();
         anim_sleep_luna = timer_read32();
-        display_flags ^= BMP_USER_FLAG_OLED_ON;
+        display_flags &= ~BMP_USER_FLAG_OLED_ON;
     } else if (timer_elapsed32(anim_sleep_luna) > OLED_TIMEOUT) {
         oled_off();
         return;
