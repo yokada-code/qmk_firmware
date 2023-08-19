@@ -2,6 +2,7 @@
 #include "bmp.h"
 #include "oled.h"
 
+uint8_t display_flags = 0;
 static bool is_ble_advertising = false;
 
 void set_bt_connection_status_str(void){

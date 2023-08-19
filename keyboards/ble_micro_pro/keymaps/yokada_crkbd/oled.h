@@ -18,3 +18,10 @@ void get_bt_connection_status_str(char *status_str, char *host_name);
 #define CON_STATUS_STR_LEN 5
 uint8_t ble_con_status[CON_STATUS_STR_LEN];
 uint8_t ble_con_hostname[CON_STATUS_STR_LEN];
+
+#define BMP_USER_DATA_WPM     1
+#define BMP_USER_DATA_FLAGS   2
+
+extern uint8_t display_flags;
+
+#define BMP_USER_FLAG_OLED_ON 1

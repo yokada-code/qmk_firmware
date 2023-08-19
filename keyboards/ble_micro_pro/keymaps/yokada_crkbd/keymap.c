@@ -77,6 +77,16 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 
 void oled_task_user(void) {
     if (is_keyboard_master()) {
+        static uint8_t last_wpm = 0;
+        uint8_t current_wpm = get_current_wpm();
+        if (last_wpm != current_wpm) {
+            bmp_user_data_1byte dat = {
+                .type = BMP_USER_DATA_WPM,
+                .data = current_wpm,
+            };
+            BMPAPI->ble.nus_send_bytes((uint8_t*)&dat, sizeof(dat));
+            current_wpm = last_wpm;
+        }
         print_status_luna();
     } else {
         print_status_bongo();
@@ -90,6 +100,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (continue_process == false) {
         return false;
     }
+    if (!is_oled_on()) {
+        display_flags |= BMP_USER_FLAG_OLED_ON;
+        bmp_user_data_1byte dat = {
+            .type = BMP_USER_DATA_FLAGS,
+            .data = display_flags,
+        };
+        BMPAPI->ble.nus_send_bytes((uint8_t*)&dat, sizeof(dat));
+    }
     return true;
 }
 
+void ble_slave_user_data_rcv_1byte_cb(bmp_user_data_1byte* dat) {
+    switch (dat->type) {
+        case BMP_USER_DATA_WPM:
+            set_current_wpm(dat->data);
+            break;
+        case BMP_USER_DATA_FLAGS:
+            display_flags = dat->data;
+            break;
+        default:
+            break;
+    }
+}
