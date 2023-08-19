@@ -1,6 +1,7 @@
 #include QMK_KEYBOARD_H
 #include "bmp.h"
 #include "oled.h"
+#include <string.h>
 
 uint8_t display_flags = 0;
 static bool is_ble_advertising = false;
@@ -26,18 +27,14 @@ void set_bt_connection_status_str(void){
     }
 
     if (is_keyboard_master()) {
-        if (is_ble_connected()){
+        if (get_ble_enabled()){
             uint8_t *hostname_full;
             uint16_t stat = BMPAPI->ble.get_connection_status();
             int i;
 
             if ((stat >> 8) == 0) {
                 ble_con_status[0] = '-';
-                ble_con_hostname[0] = '-';
-                ble_con_hostname[1] = '-';
-                ble_con_hostname[2] = '-';
-                ble_con_hostname[3] = '-';
-                ble_con_hostname[4] = '\0';
+                memcpy(ble_con_hostname, "----", CON_STATUS_STR_LEN);
             } else {
                 ble_con_status[0] = get_hex_char(stat & 0xff);
 
@@ -48,25 +45,15 @@ void set_bt_connection_status_str(void){
                      }
                 }
 
-                for (i=0; i<CON_STATUS_STR_LEN-1 && hostname_full[i] != '\0'; i++) {
-                    ble_con_hostname[i] = (char)hostname_full[i];
-                }
-                ble_con_hostname[i] = '\0';
+                memcpy(ble_con_hostname, hostname_full, CON_STATUS_STR_LEN);
+                ble_con_hostname[CON_STATUS_STR_LEN-1] = '\0';   // chop the string with the display length
             }
-        } else if (is_usb_connected()){
+        } else if (get_usb_enabled()){
             ble_con_status[0] = '-';
-            ble_con_hostname[0] = ' ';
-            ble_con_hostname[1] = 'U';
-            ble_con_hostname[2] = 'S';
-            ble_con_hostname[3] = 'B';
-            ble_con_hostname[4] = '\0';
+            memcpy(ble_con_hostname, " USB", CON_STATUS_STR_LEN);
         } else {
-            ble_con_status[0] = '-';
-            ble_con_hostname[0] = '-';
-            ble_con_hostname[1] = '-';
-            ble_con_hostname[2] = '-';
-            ble_con_hostname[3] = '-';
-            ble_con_hostname[4] = '\0';
+            ble_con_status[0] = '!';
+            memcpy(ble_con_hostname, " ERR", CON_STATUS_STR_LEN);
         }
     } else {
         ble_con_status[0] = 'M';
@@ -76,6 +63,10 @@ void set_bt_connection_status_str(void){
     ble_con_status[2] = get_hex_char(bonding_map >> 4);
     ble_con_status[3] = get_hex_char(bonding_map & 0xf);
     ble_con_status[4] = '\0';
+}
+
+void bmp_select_changed_user_cb() {
+    set_bt_connection_status_str();
 }
 
 __attribute__((weak)) void bmp_state_change_cb_user(bmp_api_event_t event) {}
@@ -88,13 +79,10 @@ void bmp_state_change_cb_kb(bmp_api_event_t event) {
             break;
 
         case BLE_ADVERTISING_STOP:
-            is_ble_advertising = false;
-            set_bt_connection_status_str();
-            break;
-
         case BLE_CONNECTED:
             is_ble_advertising = false;
-            set_bt_connection_status_str();
+            break;
+
         case BLE_DISCONNECTED:
             //is_ble_advertising = false;
             break;
@@ -102,6 +90,7 @@ void bmp_state_change_cb_kb(bmp_api_event_t event) {
         default:
             break;
     }
+    set_bt_connection_status_str();
     bmp_state_change_cb_user(event);
 }
 
