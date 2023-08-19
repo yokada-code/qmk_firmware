@@ -50,10 +50,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "suspend.h"
 #include "wait.h"
 #include "matrix.h"
-#ifdef BLE_WPM_SEND_FROM_MASTER
-    #include "wpm.h"
-#endif
-
 
 #include "apidef.h"
 #include "cli.h"
@@ -144,14 +140,6 @@ void main_tasks(void* context) {
       rgblight_get_syncinfo(&rgblight_sync);
       BMPAPI->ble.nus_send_bytes((uint8_t*)&rgblight_sync, sizeof(rgblight_sync));
       rgblight_clear_change_flags();
-    }
-#endif
-#ifdef BLE_WPM_SEND_FROM_MASTER
-    static uint8_t previous_wpm = 0;
-    uint8_t current_wpm = get_current_wpm();
-    if (current_wpm != previous_wpm) {
-        BMPAPI->ble.nus_send_bytes((uint8_t*)&current_wpm, sizeof(current_wpm));
-        previous_wpm = current_wpm;
     }
 #endif
   }

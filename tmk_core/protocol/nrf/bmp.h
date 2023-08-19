@@ -46,3 +46,8 @@ void bmp_before_sleep();
 void tap_code_ex(uint16_t kc, keyevent_t keyevent);
 void register_code_ex(uint16_t kc, keyevent_t keyevent);
 void unregister_code_ex(uint16_t kc, keyevent_t keyevent);
+
+typedef struct {
+    uint8_t type;
+    uint8_t data;
+} bmp_user_data_1byte;
