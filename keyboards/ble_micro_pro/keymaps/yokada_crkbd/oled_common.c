@@ -16,7 +16,7 @@ static char get_hex_char(uint8_t i){
     }
 }
 
-void set_bt_connection_status_str(void){
+void update_bt_connection_status_str(void){
     bmp_api_bonding_info_t peers[8];
     uint32_t peer_cnt = sizeof(peers)/sizeof(peers[0]);
     uint8_t bonding_map = 0;
@@ -31,6 +31,8 @@ void set_bt_connection_status_str(void){
             uint8_t *hostname_full;
             uint16_t stat = BMPAPI->ble.get_connection_status();
             int i;
+
+            dprintf("ble connection status: 0x%04x\n", stat);
 
             if ((stat >> 8) == 0) {
                 ble_con_status[0] = '-';
@@ -66,8 +68,11 @@ void set_bt_connection_status_str(void){
 }
 
 void bmp_select_changed_user_cb() {
-    set_bt_connection_status_str();
+    update_bt_connection_status_str();
 }
+
+uint32_t bmp_con_state_changed_timer = 0;
+bool bmp_con_state_changed = false;
 
 __attribute__((weak)) void bmp_state_change_cb_user(bmp_api_event_t event) {}
 
@@ -90,7 +95,8 @@ void bmp_state_change_cb_kb(bmp_api_event_t event) {
         default:
             break;
     }
-    set_bt_connection_status_str();
+    bmp_con_state_changed_timer = timer_read32();
+    bmp_con_state_changed = true;
     bmp_state_change_cb_user(event);
 }
 

@@ -87,6 +87,12 @@ void oled_task_user(void) {
             BMPAPI->ble.nus_send_bytes((uint8_t*)&dat, sizeof(dat));
             last_wpm = current_wpm;
         }
+
+        if (bmp_con_state_changed &&
+            timer_elapsed32(bmp_con_state_changed_timer) > BMP_CON_STATE_CHANGED_DULATION ) {
+            bmp_con_state_changed = false;
+            update_bt_connection_status_str();
+        }
         print_status_luna();
     } else {
         print_status_bongo();
