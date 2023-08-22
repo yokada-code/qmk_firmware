@@ -75,17 +75,21 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     }
 }
 
+static uint32_t animation_timer = 0;
 void oled_task_user(void) {
     if (is_keyboard_master()) {
         static uint8_t last_wpm = 0;
         uint8_t current_wpm = get_current_wpm();
-        if (last_wpm != current_wpm) {
+        if (last_wpm != current_wpm &&
+            timer_elapsed32(animation_timer) > 200 )
+        {
             bmp_user_data_1byte dat = {
                 .type = BMP_USER_DATA_WPM,
                 .data = current_wpm,
             };
             BMPAPI->ble.nus_send_bytes((uint8_t*)&dat, sizeof(dat));
             last_wpm = current_wpm;
+            animation_timer = timer_read32();
         }
 
         if (bmp_con_state_changed &&
