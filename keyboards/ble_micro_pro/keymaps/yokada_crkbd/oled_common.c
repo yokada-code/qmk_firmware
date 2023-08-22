@@ -77,24 +77,45 @@ bool bmp_con_state_changed = false;
 __attribute__((weak)) void bmp_state_change_cb_user(bmp_api_event_t event) {}
 
 void bmp_state_change_cb_kb(bmp_api_event_t event) {
+    char *event_str = "";
+    uint16_t stat = BMPAPI->ble.get_connection_status();
 
     switch (event) {
-        case BLE_ADVERTISING_START:
-            is_ble_advertising = true;
+        case USB_CONNECTED:
+            event_str = "USB_CONNECTED";
             break;
-
-        case BLE_ADVERTISING_STOP:
+        case USB_DISCONNECTED:
+            event_str = "USB_DISCONNECTED";
+            break;
         case BLE_CONNECTED:
+            event_str = "BLE_CONNECTED";
             is_ble_advertising = false;
             break;
-
         case BLE_DISCONNECTED:
-            //is_ble_advertising = false;
+            event_str = "BLE_DISCONNECTED";
             break;
-
+        case BLE_ADVERTISING_START:
+            event_str = "BLE_ADVERTISING_START";
+            is_ble_advertising = true;
+            break;
+        case BLE_ADVERTISING_STOP:
+            event_str = "BLE_ADVERTISING_STOP";
+            is_ble_advertising = false;
+            break;
+        case USB_CDC_ACM_OPEND:
+            event_str = "USB_CDC_ACM_OPEND";
+            break;
+        case USB_CDC_ACM_CLOSED:
+            event_str = "USB_CDC_ACM_CLOSED";
+            break;
+        case USB_HID_READY:
+            event_str = "USB_HID_READY";
+            break;
         default:
+            event_str = "UNKNOWN";
             break;
     }
+    dprintf("State changed event: %s, connection status: 0x%04x\n", event_str, stat);
     bmp_con_state_changed_timer = timer_read32();
     bmp_con_state_changed = true;
     bmp_state_change_cb_user(event);
