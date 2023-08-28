@@ -6,6 +6,9 @@
 uint8_t display_flags = 0;
 static bool is_ble_advertising = false;
 
+uint8_t ble_con_status[CON_STATUS_STR_LEN];
+uint8_t ble_con_hostname[CON_STATUS_STR_LEN];
+
 static char get_hex_char(uint8_t i){
     if (i<10) {
         return '0' + (char) i;
@@ -28,11 +31,11 @@ void update_bt_connection_status_str(void){
 
     if (is_keyboard_master()) {
         if (get_ble_enabled()){
-            uint8_t *hostname_full;
+            uint8_t *hostname_full = NULL;
             uint16_t stat = BMPAPI->ble.get_connection_status();
             int i;
 
-            dprintf("ble connection status: 0x%04x\n", stat);
+            dprintf("Ble connection status: 0x%04x\n", stat);
 
             if ((stat >> 8) == 0) {
                 ble_con_status[0] = '-';
