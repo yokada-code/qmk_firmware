@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include QMK_KEYBOARD_H
 #include "config.h"
 #include "oled.h"
+#include "print.h"
 #include "debug.h"
 
 #include "bmp.h"
@@ -104,9 +105,38 @@ void oled_task_user(void) {
 }
 #endif
 
+#define USER_LOG_KC_STR_LEN    16
+bool process_record_user_log(uint16_t keycode, keyrecord_t* record) {
+    char kc_str[USER_LOG_KC_STR_LEN];
+
+    if (record->event.pressed) {
+        switch (keycode) {
+            case BLE_DIS:
+            case BLE_EN:
+            case USB_DIS:
+            case USB_EN:
+            case SEL_BLE:
+            case SEL_USB:
+            case ADV_ID0 ... ADV_ID7:
+            case AD_WO_L:
+            case DEL_ID0 ... DEL_ID7:
+            case DELBNDS:
+            case ENT_DFU:
+            case ENT_WEB:
+            case BATT_LV:
+            case SAVE_EE:
+            case DEL_EE:
+                quantum_keycode2str(keycode, kc_str, USER_LOG_KC_STR_LEN);
+                log_info("BMP control key pressed: %s\n", kc_str);
+        }
+    }
+    return true;
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     bool continue_process = process_record_user_bmp(keycode, record);
     process_record_user_luna(keycode, record);
+    process_record_user_log(keycode, record);
     if (continue_process == false) {
         return false;
     }
@@ -132,4 +162,16 @@ void ble_slave_user_data_rcv_1byte_cb(bmp_user_data_1byte* dat) {
         default:
             break;
     }
+}
+
+bool enable_log_info = false;
+bmp_error_t bmp_nus_disconnect_cb_kb(void){
+    log_info("NUS disconnected ...\n");
+    return BMP_OK;
+}
+
+void keyboard_post_init_kb(void) {
+    BMPAPI->ble.set_nus_disconnect_cb(bmp_nus_disconnect_cb_kb);
+    enable_log_info = true;
+    keyboard_post_init_user();
 }
