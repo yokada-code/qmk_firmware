@@ -1,7 +1,9 @@
 #include QMK_KEYBOARD_H
 #include "bmp.h"
 #include "oled.h"
+#include "print.h"
 #include <string.h>
+#include "apidef.h"
 
 uint8_t display_flags = 0;
 static bool is_ble_advertising = false;
@@ -35,7 +37,7 @@ void update_bt_connection_status_str(void){
             uint16_t stat = BMPAPI->ble.get_connection_status();
             int i;
 
-            dprintf("Ble connection status: 0x%04x\n", stat);
+            log_info("Ble connection status: 0x%04x\n", stat);
 
             if ((stat >> 8) == 0) {
                 ble_con_status[0] = '-';
@@ -118,7 +120,8 @@ void bmp_state_change_cb_kb(bmp_api_event_t event) {
             event_str = "UNKNOWN";
             break;
     }
-    dprintf("State changed event: %s, connection status: 0x%04x\n", event_str, stat);
+
+    log_info("State changed event: %s, connection status: 0x%04x\n", event_str, stat);
     bmp_con_state_changed_timer = timer_read32();
     bmp_con_state_changed = true;
     bmp_state_change_cb_user(event);

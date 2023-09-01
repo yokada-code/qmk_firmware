@@ -30,3 +30,9 @@ extern uint32_t bmp_con_state_changed_timer;
 extern bool bmp_con_state_changed;
 
 #define BMP_CON_STATE_CHANGED_DULATION  1500
+
+extern bool enable_log_info;
+#define log_info(fmt, ...)                                  \
+    do {                                                    \
+        if (enable_log_info) xprintf(fmt, ##__VA_ARGS__); \
+    } while (0)
