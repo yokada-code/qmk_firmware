@@ -83,7 +83,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #        define OLED_BLOCK_TYPE uint16_t  // Type to use for segmenting the oled display for smart rendering, use unsigned types only
 #    endif
 #    ifndef OLED_BLOCK_COUNT
-#        define OLED_BLOCK_COUNT (sizeof(OLED_BLOCK_TYPE) * 8)  // 16 (compile time mathed)
+//#        define OLED_BLOCK_COUNT (sizeof(OLED_BLOCK_TYPE) * 8)  // 16 (compile time mathed)
+#        define OLED_BLOCK_COUNT (sizeof(OLED_BLOCK_TYPE) * 4)  // 16 (compile time mathed)
 #    endif
 #    ifndef OLED_BLOCK_SIZE
 #        define OLED_BLOCK_SIZE (OLED_MATRIX_SIZE / OLED_BLOCK_COUNT)  // 32 (compile time mathed)
