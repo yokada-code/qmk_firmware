@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "bmp_custom_keycode.h"
 #include "keycode_str_converter.h"
 #include "apidef.h"
+#include "rgblight.h"
 
 // Defines the keycodes used by our macros in process_record_user
 enum custom_keycodes {
@@ -174,4 +175,5 @@ void keyboard_post_init_kb(void) {
     BMPAPI->ble.set_nus_disconnect_cb(bmp_nus_disconnect_cb_kb);
     enable_log_info = true;
     keyboard_post_init_user();
+    rgblight_disable();
 }

@@ -36,3 +36,7 @@ extern bool enable_log_info;
     do {                                                    \
         if (enable_log_info) xprintf(fmt, ##__VA_ARGS__); \
     } while (0)
+
+#define RGBLIGHT_MODE_NAME_LEN 6
+extern uint8_t rgblight_mode_name[RGBLIGHT_MODE_NAME_LEN];
+void update_rgblight_mode_name(void);

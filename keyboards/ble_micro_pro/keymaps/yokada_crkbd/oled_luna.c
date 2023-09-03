@@ -192,6 +192,11 @@ void print_status_luna(void) {
     oled_write_P(PSTR("W:"), false);
     oled_write(get_u8_str(get_current_wpm(), '0'), false);
 
+    // Print LED status
+    update_rgblight_mode_name();
+    oled_set_cursor(0, 7);
+    oled_write((char *)rgblight_mode_name, false);
+
     // Print Bluetooth connection status
     oled_set_cursor(0, 8);
     oled_write_P(PSTR("BTCON"), false);
