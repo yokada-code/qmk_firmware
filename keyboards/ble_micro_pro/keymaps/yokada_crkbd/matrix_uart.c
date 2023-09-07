@@ -1,36 +1,38 @@
 #include QMK_KEYBOARD_H
-#include "bmp_pin_def.h"
 #include "bmp_matrix.h"
-#include "matrix_uart.h"
 #include "bmp_debounce.h"
+#include "uart_connection.h"
 
-bmp_uart_keystate_t uart_buf;
-uint8_t uart_buf_p = 0;
+#include <stdbool.h>
 
-void bmp_uart_cb(uint8_t recv) {
-    uart_buf.dat[uart_buf_p++] = recv;
-    if (uart_buf_p == sizeof(uart_buf)) {
-        uart_buf_p = 0;
-    }
-}
+typedef struct {
+    uint8_t count;
+    bmp_api_key_event_t key_state[16];
+} bmp_uart_keystate_t;
 
-void matrix_init_user(void) {
-    bmp_uart_config_t uconf = {
-        .tx_pin      = (is_keyboard_master()) ? D2 : B6,
-        .rx_pin      = (is_keyboard_master()) ? B6 : D2,
-        .baudrate    = Baud1200,
-        .rx_callback = bmp_uart_cb,
-        .rx_protocol = 1
-    };
-
-    BMPAPI->uart.init(&uconf);
-}
+extern const uint8_t MAINTASK_INTERVAL;
+static bmp_uart_keystate_t uart_buf;
 
 #define DEFAULT_MATRIX_ROWS 32
 static matrix_row_t matrix_dummy[DEFAULT_MATRIX_ROWS];
 static matrix_row_t matrix_debouncing[DEFAULT_MATRIX_ROWS];
-extern const bmp_matrix_func_t  matrix_func_row2col;
-static const bmp_matrix_func_t *matrix_func = &matrix_func_row2col;
+static const bmp_matrix_func_t *matrix_func;
+extern const bmp_matrix_func_t  matrix_func_col2row;
+
+static void bmp_uart_cb(uint8_t* data, uint8_t len) {
+    memcpy(&uart_buf, data, len);
+}
+
+void matrix_init_user(void) {
+    // initialize matrix state: all keys off
+    for (uint8_t i = 0; i < DEFAULT_MATRIX_ROWS; i++) {
+        matrix_dummy[i] = 0;
+        matrix_debouncing[i] = 0;
+    }
+
+    matrix_func = &matrix_func_col2row;
+    uart_init(bmp_uart_cb);
+}
 
 uint8_t matrix_scan_impl(matrix_row_t *_matrix) {
     const bmp_api_config_t *config     = BMPAPI->app.get_config();
@@ -47,16 +49,16 @@ uint8_t matrix_scan_impl(matrix_row_t *_matrix) {
         device_row, device_col,
         config->matrix.debounce * MAINTASK_INTERVAL, raw_changed, key_state);
 
-    for (uint8_t i; i<matrix_changed; i++) {
+    for (int i = 0; i < matrix_changed; i++) {
         key_state[i].row += matrix_offset;
     }
 
-    if (!is_keyboard_master()) { //SLAVE
+    if (!is_keyboard_master() && matrix_changed > 0) { //SLAVE
         uart_buf.count = matrix_changed;
         memcpy(uart_buf.key_state, key_state, 
                sizeof(bmp_api_key_event_t) * matrix_changed);
+        uart_send((uint8_t *)&uart_buf, sizeof(bmp_api_key_event_t) * matrix_changed + 1);
     }
-    BMPAPI->uart.send(uart_buf.dat, sizeof(uart_buf));
 
     if (debug_config.keyboard && matrix_changed > 0) {
         dprintf("device rows:\n");
@@ -75,11 +77,12 @@ uint8_t matrix_scan_impl(matrix_row_t *_matrix) {
         dprintf("\n");
     }
 
-    uint32_t pop_cnt = matrix_changed;
+    uint32_t pop_cnt = 0;
     if (is_keyboard_master()) { //MASTER
-        pop_cnt += uart_buf.count;
+        pop_cnt = matrix_changed + uart_buf.count;
         memcpy(&key_state[matrix_changed], uart_buf.key_state,
                sizeof(bmp_api_key_event_t) * uart_buf.count);
+        uart_buf.count = 0;
     }
 
     for (uint32_t i = 0; i < pop_cnt; i++) {
@@ -106,4 +109,3 @@ uint8_t matrix_scan_impl(matrix_row_t *_matrix) {
 
     return pop_cnt;
 }
-

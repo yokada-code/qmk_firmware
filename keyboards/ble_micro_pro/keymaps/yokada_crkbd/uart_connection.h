@@ -1,3 +1,5 @@
+#pragma once
+
 // Baudrate list
 // https://infocenter.nordicsemi.com/index.jsp?topic=%2Fps_nrf52840%2Fuart.html
 #define Baud1200    0x0004F000  // 1200 baud (actual rate: 1205)
@@ -19,16 +21,6 @@
 #define Baud921600  0x0EBED000  // 921600 baud (actual rate: 941176)
 #define Baud1M      0x10000000  // 1Mega baud
 
-typedef union {
-    struct {
-        uint32_t count;
-        bmp_api_key_event_t key_state[16];
-    };
-    uint8_t dat[128];
-} bmp_uart_keystate_t;
-
-extern bmp_uart_keystate_t uart_buf;
-extern uint8_t uart_buf_p;
-
-// defined in tmk_core/protocol/nrf/main_master.c
-extern uint8_t MAINTASK_INTERVAL;
+typedef void (*uart_cb)(uint8_t* data, uint8_t len);
+void uart_init(uart_cb f);
+void uart_send(uint8_t* data, uint8_t len);
