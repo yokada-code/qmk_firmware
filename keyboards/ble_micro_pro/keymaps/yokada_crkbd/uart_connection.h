@@ -21,6 +21,13 @@
 #define Baud921600  0x0EBED000  // 921600 baud (actual rate: 941176)
 #define Baud1M      0x10000000  // 1Mega baud
 
+#define UART_TYPE_MAX            16
+#define UART_TYPE_ESTABLISH       0
+#define UART_TYPE_KC_SYNC         1
+
 typedef void (*uart_cb)(uint8_t* data, uint8_t len);
-void uart_init(uart_cb f);
-void uart_send(uint8_t* data, uint8_t len);
+void uart_init(void);
+void uart_send(uint8_t type, uint8_t* data, uint8_t len);
+void uart_set_cb(uint8_t type, uart_cb f);
+void uart_start_connection(void);
+bool is_uart_established(void);

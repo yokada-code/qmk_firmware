@@ -31,7 +31,8 @@ void matrix_init_user(void) {
     }
 
     matrix_func = &matrix_func_col2row;
-    uart_init(bmp_uart_cb);
+    uart_set_cb(UART_TYPE_KC_SYNC, bmp_uart_cb);
+    uart_init();
 }
 
 uint8_t matrix_scan_impl(matrix_row_t *_matrix) {
@@ -49,15 +50,22 @@ uint8_t matrix_scan_impl(matrix_row_t *_matrix) {
         device_row, device_col,
         config->matrix.debounce * MAINTASK_INTERVAL, raw_changed, key_state);
 
-    for (int i = 0; i < matrix_changed; i++) {
-        key_state[i].row += matrix_offset;
-    }
+    if (is_uart_established()) {
+        for (int i = 0; i < matrix_changed; i++) {
+            key_state[i].row += matrix_offset;
+        }
 
-    if (!is_keyboard_master() && matrix_changed > 0) { //SLAVE
-        uart_buf.count = matrix_changed;
-        memcpy(uart_buf.key_state, key_state, 
-               sizeof(bmp_api_key_event_t) * matrix_changed);
-        uart_send((uint8_t *)&uart_buf, sizeof(bmp_api_key_event_t) * matrix_changed + 1);
+        if (!is_keyboard_master() && matrix_changed > 0) { //SLAVE
+            uart_buf.count = matrix_changed;
+            memcpy(uart_buf.key_state, key_state,
+                    sizeof(bmp_api_key_event_t) * matrix_changed);
+            uart_send(UART_TYPE_KC_SYNC, (uint8_t *)&uart_buf,
+                    sizeof(bmp_api_key_event_t) * matrix_changed + 1);
+        }
+    } else {
+        for (int i = 0; i < matrix_changed; i++) {
+            BMPAPI->app.push_keystate_change(&key_state[i]);
+        }
     }
 
     if (debug_config.keyboard && matrix_changed > 0) {
@@ -78,11 +86,17 @@ uint8_t matrix_scan_impl(matrix_row_t *_matrix) {
     }
 
     uint32_t pop_cnt = 0;
-    if (is_keyboard_master()) { //MASTER
-        pop_cnt = matrix_changed + uart_buf.count;
-        memcpy(&key_state[matrix_changed], uart_buf.key_state,
-               sizeof(bmp_api_key_event_t) * uart_buf.count);
-        uart_buf.count = 0;
+    if (is_uart_established()) {
+        if (is_keyboard_master()) { //MASTER
+            pop_cnt = matrix_changed + uart_buf.count;
+            memcpy(&key_state[matrix_changed], uart_buf.key_state,
+                   sizeof(bmp_api_key_event_t) * uart_buf.count);
+            uart_buf.count = 0;
+        }
+    } else {
+        pop_cnt = BMPAPI->app.pop_keystate_change(
+            key_state, sizeof(key_state) / sizeof(key_state[0]),
+            config->param_central.max_interval / MAINTASK_INTERVAL + 3);
     }
 
     for (uint32_t i = 0; i < pop_cnt; i++) {
