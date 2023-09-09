@@ -5,12 +5,13 @@
 #include <string.h>
 #include "apidef.h"
 #include "rgblight.h"
+#include "uart_connection.h"
 
 uint8_t display_flags = 0;
 static bool is_ble_advertising = false;
 
 uint8_t ble_con_status[CON_STATUS_STR_LEN];
-uint8_t ble_con_hostname[CON_STATUS_STR_LEN];
+uint8_t ble_con_hostname[CON_HOSTNAME_LEN];
 
 static char get_hex_char(uint8_t i){
     if (i<10) {
@@ -91,6 +92,11 @@ void update_bt_connection_status_str(void){
          bonding_map |= 1 << peers[i].id;
     }
 
+    if (is_uart_established()) {
+        ble_con_status[0] = '\7';  // Nakaguro(U+30FB)
+    } else {
+        ble_con_status[0] = ' ';
+    }
     if (is_keyboard_master()) {
         if (get_ble_enabled()){
             uint8_t *hostname_full = NULL;
@@ -100,10 +106,10 @@ void update_bt_connection_status_str(void){
             log_info("Ble connection status: 0x%04x\n", stat);
 
             if ((stat >> 8) == 0) {
-                ble_con_status[0] = '-';
-                memcpy(ble_con_hostname, "----", CON_STATUS_STR_LEN);
+                ble_con_status[1] = '-';
+                strcpy((char*)ble_con_hostname, "----");
             } else {
-                ble_con_status[0] = get_hex_char(stat & 0xff);
+                ble_con_status[1] = get_hex_char(stat & 0xff);
 
                 for (i = 0; i < peer_cnt; i++) {
                      if (peers[i].id == (stat & 0xff)) {
@@ -112,24 +118,26 @@ void update_bt_connection_status_str(void){
                      }
                 }
 
-                memcpy(ble_con_hostname, hostname_full, CON_STATUS_STR_LEN);
-                ble_con_hostname[CON_STATUS_STR_LEN-1] = '\0';   // chop the string with the display length
+                // Using memcpy to avoid buffer overrun and
+                // chop the string with the display length.
+                memcpy(ble_con_hostname, hostname_full, CON_HOSTNAME_LEN);
+                ble_con_hostname[CON_HOSTNAME_LEN-1] = '\0';
             }
         } else if (get_usb_enabled()){
-            ble_con_status[0] = '-';
-            memcpy(ble_con_hostname, " USB", CON_STATUS_STR_LEN);
+            ble_con_status[1] = '-';
+            strcpy((char*)ble_con_hostname, " USB");
         } else {
-            ble_con_status[0] = '!';
-            memcpy(ble_con_hostname, " ERR", CON_STATUS_STR_LEN);
+            ble_con_status[1] = '!';
+            strcpy((char*)ble_con_hostname, " ERR");
         }
     } else {
-        ble_con_status[0] = 'M';
+        ble_con_status[1] = 'M';
         ble_con_hostname[0] = '\0';
     }
-    ble_con_status[1] = ':';
-    ble_con_status[2] = get_hex_char(bonding_map >> 4);
-    ble_con_status[3] = get_hex_char(bonding_map & 0xf);
-    ble_con_status[4] = '\0';
+    ble_con_status[2] = ':';
+    ble_con_status[3] = get_hex_char(bonding_map >> 4);
+    ble_con_status[4] = get_hex_char(bonding_map & 0xf);
+    ble_con_status[5] = '\0';
 }
 
 void bmp_select_changed_user_cb() {

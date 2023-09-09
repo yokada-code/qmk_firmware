@@ -200,7 +200,7 @@ void print_status_luna(void) {
     // Print Bluetooth connection status
     oled_set_cursor(0, 8);
     oled_write_P(PSTR("BTCON"), false);
-    oled_set_cursor(1, 9);
+    oled_set_cursor(0, 9);
     oled_write((char*)ble_con_status, false);
     oled_set_cursor(1, 10);
     oled_write((char*)ble_con_hostname, false);

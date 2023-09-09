@@ -15,9 +15,10 @@ char get_bt_advertisement_status_char(void);
 void get_bt_connection_status_str(char *status_str, char *host_name);
 void update_bt_connection_status_str(void);
 
-#define CON_STATUS_STR_LEN 5
-extern uint8_t ble_con_status[CON_STATUS_STR_LEN];
-extern uint8_t ble_con_hostname[CON_STATUS_STR_LEN];
+#define CON_STATUS_STR_LEN 6
+#define CON_HOSTNAME_LEN 5
+extern uint8_t ble_con_status[];
+extern uint8_t ble_con_hostname[];
 
 #define BMP_USER_DATA_WPM     1
 #define BMP_USER_DATA_FLAGS   2

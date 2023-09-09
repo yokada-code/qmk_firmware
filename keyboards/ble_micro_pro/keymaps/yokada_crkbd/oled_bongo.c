@@ -131,7 +131,7 @@ void print_status_bongo(void){
     oled_write(get_u8_str(get_current_wpm(), '0'), false);
 
      // Print Bluetooth connection status
-    oled_set_cursor(17, 1);
+    oled_set_cursor(16, 1);
     oled_write((char*) ble_con_status, false);
 
     // Print Bluetooth advertisement status
